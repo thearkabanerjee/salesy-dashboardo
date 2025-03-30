@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
@@ -10,11 +10,15 @@ interface StatCardProps {
   change: number;
   icon: React.ReactNode;
   iconColor?: string;
+  onClick?: () => void;
 }
 
-const StatCard = ({ title, value, change, icon, iconColor = "bg-blue-100" }: StatCardProps) => {
+const StatCard = ({ title, value, change, icon, iconColor = "bg-blue-100", onClick }: StatCardProps) => {
   return (
-    <Card className="overflow-hidden">
+    <Card 
+      className={cn("overflow-hidden transition-all duration-200", onClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02]")}
+      onClick={onClick}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -35,8 +39,16 @@ const StatCard = ({ title, value, change, icon, iconColor = "bg-blue-100" }: Sta
               <span className="text-xs text-muted-foreground ml-2">vs last month</span>
             </div>
           </div>
-          <div className={cn("p-4 rounded-full", iconColor)}>
-            {icon}
+          <div className="flex flex-col items-end">
+            <div className={cn("p-4 rounded-full", iconColor)}>
+              {icon}
+            </div>
+            {onClick && (
+              <div className="mt-2 text-xs text-blue-500 flex items-center gap-1">
+                <span>View details</span>
+                <ExternalLink size={12} />
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

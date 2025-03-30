@@ -2,12 +2,16 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from "@/components/ui/use-toast";
 
 interface SalesDistributionChartProps {
   data: {
     name: string;
     value: number;
     color: string;
+    url?: string;
   }[];
 }
 
@@ -25,10 +29,57 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 
 const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
+  const handleCategoryClick = (entry: any) => {
+    if (entry && entry.url) {
+      window.open(entry.url, '_blank');
+      toast({
+        title: `${entry.name} Category Selected`,
+        description: `Viewing detailed sales data for ${entry.name}.`,
+      });
+    }
+  };
+
+  const renderCustomizedLegend = (props: any) => {
+    const { payload } = props;
+    return (
+      <ul className="flex flex-wrap justify-center gap-4 mt-2">
+        {payload.map((entry: any, index: number) => (
+          <li 
+            key={`item-${index}`} 
+            className="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition-colors"
+            onClick={() => handleCategoryClick(data[index])}
+          >
+            <div 
+              style={{ 
+                backgroundColor: entry.color,
+                width: 10,
+                height: 10,
+                borderRadius: '50%'
+              }} 
+            />
+            <span>{entry.value}</span>
+            {data[index].url && <ExternalLink size={12} />}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Sales Distribution</CardTitle>
+        <CardTitle className="flex justify-between items-center">
+          <span>Sales Distribution</span>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs text-blue-500 flex items-center gap-1"
+            onClick={() => window.open('https://example.com/distribution', '_blank')}
+          >
+            <span>View All</span> 
+            <ExternalLink size={12} />
+          </Button>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -43,6 +94,8 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
                 outerRadius={110}
                 fill="#8884d8"
                 dataKey="value"
+                onClick={handleCategoryClick}
+                className="cursor-pointer"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -53,6 +106,7 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
                 align="center"
                 layout="horizontal"
                 iconType="circle"
+                content={renderCustomizedLegend}
               />
               <Tooltip 
                 formatter={(value: number) => [`$${value.toLocaleString()}`, 'Value']}
