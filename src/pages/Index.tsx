@@ -28,11 +28,11 @@ const distributionData = [
 ];
 
 const recentSales = [
-  { id: '1', customer: 'John Smith', product: 'Premium Headphones', amount: 299, status: 'completed', date: '2023-09-10' },
-  { id: '2', customer: 'Emily Johnson', product: 'Wireless Keyboard', amount: 129, status: 'pending', date: '2023-09-09' },
-  { id: '3', customer: 'Michael Brown', product: 'Smart Watch', amount: 449, status: 'completed', date: '2023-09-09' },
-  { id: '4', customer: 'Sarah Davis', product: 'Laptop Stand', amount: 79, status: 'failed', date: '2023-09-08' },
-  { id: '5', customer: 'Robert Wilson', product: 'External SSD', amount: 199, status: 'completed', date: '2023-09-08' },
+  { id: '1', customer: 'John Smith', product: 'Premium Headphones', amount: 299, status: 'completed' as const, date: '2023-09-10' },
+  { id: '2', customer: 'Emily Johnson', product: 'Wireless Keyboard', amount: 129, status: 'pending' as const, date: '2023-09-09' },
+  { id: '3', customer: 'Michael Brown', product: 'Smart Watch', amount: 449, status: 'completed' as const, date: '2023-09-09' },
+  { id: '4', customer: 'Sarah Davis', product: 'Laptop Stand', amount: 79, status: 'failed' as const, date: '2023-09-08' },
+  { id: '5', customer: 'Robert Wilson', product: 'External SSD', amount: 199, status: 'completed' as const, date: '2023-09-08' },
 ];
 
 const topCustomers = [
