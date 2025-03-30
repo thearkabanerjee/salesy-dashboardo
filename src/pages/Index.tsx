@@ -11,21 +11,21 @@ import { toast } from "@/components/ui/use-toast";
 
 // Mock data
 const revenueData = [
-  { name: 'Jan', revenue: 35000 },
-  { name: 'Feb', revenue: 28000 },
-  { name: 'Mar', revenue: 42000 },
-  { name: 'Apr', revenue: 38000 },
-  { name: 'May', revenue: 45000 },
-  { name: 'Jun', revenue: 53000 },
-  { name: 'Jul', revenue: 49000 },
-  { name: 'Aug', revenue: 62000 },
+  { name: 'Jan', revenue: 35000, url: 'https://example.com/analytics/revenue/jan' },
+  { name: 'Feb', revenue: 28000, url: 'https://example.com/analytics/revenue/feb' },
+  { name: 'Mar', revenue: 42000, url: 'https://example.com/analytics/revenue/mar' },
+  { name: 'Apr', revenue: 38000, url: 'https://example.com/analytics/revenue/apr' },
+  { name: 'May', revenue: 45000, url: 'https://example.com/analytics/revenue/may' },
+  { name: 'Jun', revenue: 53000, url: 'https://example.com/analytics/revenue/jun' },
+  { name: 'Jul', revenue: 49000, url: 'https://example.com/analytics/revenue/jul' },
+  { name: 'Aug', revenue: 62000, url: 'https://example.com/analytics/revenue/aug' },
 ];
 
 const distributionData = [
-  { name: 'Electronics', value: 45000, color: '#60A5FA', url: 'https://example.com/electronics' },
-  { name: 'Clothing', value: 32000, color: '#34D399', url: 'https://example.com/clothing' },
-  { name: 'Accessories', value: 18000, color: '#A78BFA', url: 'https://example.com/accessories' },
-  { name: 'Furniture', value: 25000, color: '#F87171', url: 'https://example.com/furniture' },
+  { name: 'Electronics', value: 45000, color: '#60A5FA', url: 'https://example.com/products/electronics' },
+  { name: 'Clothing', value: 32000, color: '#34D399', url: 'https://example.com/products/clothing' },
+  { name: 'Accessories', value: 18000, color: '#A78BFA', url: 'https://example.com/products/accessories' },
+  { name: 'Furniture', value: 25000, color: '#F87171', url: 'https://example.com/products/furniture' },
 ];
 
 const recentSales = [
@@ -43,6 +43,18 @@ const topCustomers = [
   { id: '4', name: 'Sarah Davis', initials: 'SD', spent: 6750, progress: 45, url: 'https://example.com/customers/sarah-davis' },
 ];
 
+// Mock external links
+const mockLinks = {
+  revenue: 'https://example.com/analytics/revenue',
+  sales: 'https://example.com/analytics/sales',
+  orders: 'https://example.com/analytics/orders',
+  conversions: 'https://example.com/analytics/conversions',
+  revenueReport: 'https://example.com/reports/revenue',
+  distribution: 'https://example.com/reports/distribution',
+  allSales: 'https://example.com/sales/all',
+  allCustomers: 'https://example.com/customers/all'
+};
+
 const Dashboard = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [category, setCategory] = useState('all');
@@ -53,6 +65,13 @@ const Dashboard = () => {
     toast({
       title: `Viewing ${title}`,
       description: `Navigating to detailed ${title.toLowerCase()} information.`,
+    });
+  };
+
+  const handleFilterChange = () => {
+    toast({
+      title: "Filters Applied",
+      description: "Dashboard data has been filtered based on your criteria.",
     });
   };
 
@@ -70,6 +89,7 @@ const Dashboard = () => {
         setCategory={setCategory}
         search={search}
         setSearch={setSearch}
+        onFilterChange={handleFilterChange}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -79,7 +99,7 @@ const Dashboard = () => {
           change={12.5} 
           icon={<ChartBar size={24} className="text-dashboard-blue" />}
           iconColor="bg-blue-100"
-          onClick={() => handleCardClick("Revenue Analytics", "https://example.com/revenue")}
+          onClick={() => handleCardClick("Revenue Analytics", mockLinks.revenue)}
         />
         <StatCard 
           title="Total Sales" 
@@ -87,7 +107,7 @@ const Dashboard = () => {
           change={8.2} 
           icon={<ChartBar size={24} className="text-dashboard-green" />}
           iconColor="bg-green-100"
-          onClick={() => handleCardClick("Sales Data", "https://example.com/sales")}
+          onClick={() => handleCardClick("Sales Data", mockLinks.sales)}
         />
         <StatCard 
           title="Average Order" 
@@ -95,7 +115,7 @@ const Dashboard = () => {
           change={-3.8} 
           icon={<ChartPie size={24} className="text-dashboard-purple" />}
           iconColor="bg-purple-100"
-          onClick={() => handleCardClick("Order Analytics", "https://example.com/orders")}
+          onClick={() => handleCardClick("Order Analytics", mockLinks.orders)}
         />
         <StatCard 
           title="Conversion Rate" 
@@ -103,18 +123,30 @@ const Dashboard = () => {
           change={5.3} 
           icon={<Filter size={24} className="text-dashboard-orange" />}
           iconColor="bg-orange-100"
-          onClick={() => handleCardClick("Conversion Metrics", "https://example.com/conversions")}
+          onClick={() => handleCardClick("Conversion Metrics", mockLinks.conversions)}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <RevenueChart data={revenueData} />
-        <SalesDistributionChart data={distributionData} />
+        <RevenueChart 
+          data={revenueData} 
+          reportUrl={mockLinks.revenueReport}
+        />
+        <SalesDistributionChart 
+          data={distributionData} 
+          reportUrl={mockLinks.distribution}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <SalesTable data={recentSales} />
-        <TopCustomers data={topCustomers} />
+        <SalesTable 
+          data={recentSales} 
+          viewAllUrl={mockLinks.allSales}
+        />
+        <TopCustomers 
+          data={topCustomers} 
+          viewAllUrl={mockLinks.allCustomers}
+        />
       </div>
     </div>
   );

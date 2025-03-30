@@ -10,7 +10,9 @@ interface RevenueChartProps {
   data: {
     name: string;
     revenue: number;
+    url?: string;
   }[];
+  reportUrl?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -19,24 +21,34 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div className="bg-white p-4 shadow-lg rounded-lg border">
         <p className="font-medium">{label}</p>
         <p className="text-dashboard-blue font-semibold">${payload[0].value.toLocaleString()}</p>
+        <p className="text-xs text-blue-500 mt-1">Click to view details</p>
       </div>
     );
   }
   return null;
 };
 
-const RevenueChart = ({ data }: RevenueChartProps) => {
+const RevenueChart = ({ data, reportUrl }: RevenueChartProps) => {
   const handleBarClick = (data: any) => {
     const month = data.name;
-    window.open(`https://example.com/revenue/${month.toLowerCase()}`, '_blank');
+    const url = data.url || `https://example.com/revenue/${month.toLowerCase()}`;
+    window.open(url, '_blank');
     toast({
       title: `${month} Revenue`,
       description: `Viewing detailed revenue data for ${month}.`,
     });
   };
 
+  const handleViewReport = () => {
+    window.open(reportUrl || 'https://example.com/revenue-overview', '_blank');
+    toast({
+      title: "Revenue Report",
+      description: "Opening the comprehensive revenue report.",
+    });
+  };
+
   return (
-    <Card className="col-span-2">
+    <Card className="col-span-2 hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between items-center">
           <span>Revenue Overview</span>
@@ -44,7 +56,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
             variant="ghost" 
             size="sm" 
             className="text-xs text-blue-500 flex items-center gap-1"
-            onClick={() => window.open('https://example.com/revenue-overview', '_blank')}
+            onClick={handleViewReport}
           >
             <span>View Report</span> 
             <ExternalLink size={12} />
@@ -57,7 +69,6 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
             <BarChart 
               data={data} 
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              onClick={handleBarClick}
               className="cursor-pointer"
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -74,6 +85,8 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
                 fill="#60A5FA" 
                 radius={[4, 4, 0, 0]}
                 barSize={40}
+                onClick={handleBarClick}
+                className="hover:opacity-80 transition-opacity"
               />
             </BarChart>
           </ResponsiveContainer>

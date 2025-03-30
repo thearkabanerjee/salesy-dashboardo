@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from "@/components/ui/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Sale {
   id: string;
@@ -19,6 +20,7 @@ interface Sale {
 
 interface SalesTableProps {
   data: Sale[];
+  viewAllUrl?: string;
 }
 
 const statusColorMap = {
@@ -27,19 +29,25 @@ const statusColorMap = {
   failed: "bg-red-100 text-red-800",
 };
 
-const SalesTable = ({ data }: SalesTableProps) => {
+const SalesTable = ({ data, viewAllUrl }: SalesTableProps) => {
   const handleRowClick = (sale: Sale) => {
-    if (sale.url) {
-      window.open(sale.url, '_blank');
-      toast({
-        title: "Sale Details",
-        description: `Viewing details for sale #${sale.id} - ${sale.product}`,
-      });
-    }
+    window.open(sale.url || `https://example.com/sales/${sale.id}`, '_blank');
+    toast({
+      title: "Sale Details",
+      description: `Viewing details for sale #${sale.id} - ${sale.product}`,
+    });
+  };
+
+  const handleViewAll = () => {
+    window.open(viewAllUrl || 'https://example.com/all-sales', '_blank');
+    toast({
+      title: "All Sales",
+      description: "Viewing the complete sales record.",
+    });
   };
 
   return (
-    <Card className="col-span-3">
+    <Card className="col-span-3 hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between items-center">
           <span>Recent Sales</span>
@@ -47,7 +55,7 @@ const SalesTable = ({ data }: SalesTableProps) => {
             variant="ghost" 
             size="sm" 
             className="text-xs text-blue-500 flex items-center gap-1"
-            onClick={() => window.open('https://example.com/all-sales', '_blank')}
+            onClick={handleViewAll}
           >
             <span>View All</span> 
             <ExternalLink size={12} />
@@ -67,24 +75,32 @@ const SalesTable = ({ data }: SalesTableProps) => {
           </TableHeader>
           <TableBody>
             {data.map((sale) => (
-              <TableRow 
-                key={sale.id} 
-                className={sale.url ? "cursor-pointer hover:bg-gray-50" : ""}
-                onClick={() => handleRowClick(sale)}
-              >
-                <TableCell className="font-medium flex items-center gap-1">
-                  {sale.customer}
-                  {sale.url && <ExternalLink size={12} className="text-blue-500" />}
-                </TableCell>
-                <TableCell>{sale.product}</TableCell>
-                <TableCell>${sale.amount.toLocaleString()}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusColorMap[sale.status]}>
-                    {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell>{sale.date}</TableCell>
-              </TableRow>
+              <TooltipProvider key={sale.id}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TableRow 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleRowClick(sale)}
+                    >
+                      <TableCell className="font-medium flex items-center gap-1">
+                        {sale.customer}
+                        <ExternalLink size={12} className="text-blue-500" />
+                      </TableCell>
+                      <TableCell>{sale.product}</TableCell>
+                      <TableCell>${sale.amount.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={statusColorMap[sale.status]}>
+                          {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{sale.date}</TableCell>
+                    </TableRow>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Click to view sale details</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           </TableBody>
         </Table>

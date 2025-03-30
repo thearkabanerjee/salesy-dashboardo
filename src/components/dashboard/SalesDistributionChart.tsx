@@ -13,6 +13,7 @@ interface SalesDistributionChartProps {
     color: string;
     url?: string;
   }[];
+  reportUrl?: string;
 }
 
 const RADIAN = Math.PI / 180;
@@ -28,15 +29,24 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
-const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
-  const handleCategoryClick = (entry: any) => {
-    if (entry && entry.url) {
-      window.open(entry.url, '_blank');
+const SalesDistributionChart = ({ data, reportUrl }: SalesDistributionChartProps) => {
+  const handleCategoryClick = (entry: any, index: number) => {
+    const item = data[index];
+    if (item) {
+      window.open(item.url || `https://example.com/category/${item.name.toLowerCase()}`, '_blank');
       toast({
-        title: `${entry.name} Category Selected`,
-        description: `Viewing detailed sales data for ${entry.name}.`,
+        title: `${item.name} Category Selected`,
+        description: `Viewing detailed sales data for ${item.name}.`,
       });
     }
+  };
+
+  const handleViewAll = () => {
+    window.open(reportUrl || 'https://example.com/distribution', '_blank');
+    toast({
+      title: "Distribution Report",
+      description: "Opening the complete sales distribution report.",
+    });
   };
 
   const renderCustomizedLegend = (props: any) => {
@@ -47,7 +57,7 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
           <li 
             key={`item-${index}`} 
             className="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition-colors"
-            onClick={() => handleCategoryClick(data[index])}
+            onClick={() => handleCategoryClick(entry, index)}
           >
             <div 
               style={{ 
@@ -58,7 +68,7 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
               }} 
             />
             <span>{entry.value}</span>
-            {data[index].url && <ExternalLink size={12} />}
+            <ExternalLink size={12} className="text-blue-500" />
           </li>
         ))}
       </ul>
@@ -66,7 +76,7 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
   };
 
   return (
-    <Card>
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between items-center">
           <span>Sales Distribution</span>
@@ -74,7 +84,7 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
             variant="ghost" 
             size="sm" 
             className="text-xs text-blue-500 flex items-center gap-1"
-            onClick={() => window.open('https://example.com/distribution', '_blank')}
+            onClick={handleViewAll}
           >
             <span>View All</span> 
             <ExternalLink size={12} />
@@ -96,9 +106,27 @@ const SalesDistributionChart = ({ data }: SalesDistributionChartProps) => {
                 dataKey="value"
                 onClick={handleCategoryClick}
                 className="cursor-pointer"
+                activeIndex={[]}
+                activeShape={(props) => {
+                  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+                  return (
+                    <g>
+                      <path
+                        d={{...props}.arc}
+                        fill={fill}
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    </g>
+                  );
+                }}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.color} 
+                    className="hover:opacity-80 transition-opacity"
+                  />
                 ))}
               </Pie>
               <Legend 
